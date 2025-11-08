@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IME v3.0 - Integrated Multiverse Engine</title>
+    <link rel="stylesheet" href="src/css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="info-panel">
+            <h1>IME v3.0 - NEXUS HUB</h1>
+            <div id="stats">
+                <span>Soul Seed: <span id="soul-seed">Loading...</span></span>
+                <span>Gold: <span id="gold">0</span></span>
+                <span>World: <span id="current-world">NEXUS</span></span>
+            </div>
+            <div id="controls-help">
+                <strong>Controls:</strong>
+                <ul>
+                    <li><kbd>WASD</kbd> or <kbd>Arrow Keys</kbd> - Move</li>
+                    <li><kbd>F</kbd> - Toggle Resolution (Retro/Modern)</li>
+                    <li><kbd>V</kbd> - Vault (NEXUS only)</li>
+                    <li><kbd>P</kbd> - Portal Jump (enter seed)</li>
+                    <li><kbd>ESC</kbd> - Return to NEXUS</li>
+                </ul>
+            </div>
+        </div>
+        
+        <canvas id="game-canvas"></canvas>
+        
+        <div id="debug-panel">
+            <h3>Debug Info</h3>
+            <div id="debug-info">
+                <div>FPS: <span id="fps">0</span></div>
+                <div>Position: <span id="position">0, 0</span></div>
+                <div>Tile: <span id="current-tile">0</span></div>
+                <div>Room: <span id="current-room">-</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portal Jump Modal -->
+    <div id="portal-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Portal Jump</h2>
+            <p>Enter a world seed to generate a new dungeon:</p>
+            <input type="text" id="seed-input" placeholder="Enter seed (e.g., WORLD-001)" maxlength="32">
+            <div class="modal-buttons">
+                <button id="portal-jump-btn">Jump</button>
+                <button id="portal-cancel-btn">Cancel</button>
+            </div>
+            <div class="seed-suggestions">
+                <p>Try these seeds:</p>
+                <button class="seed-suggestion" data-seed="FOREST-001">Forest World</button>
+                <button class="seed-suggestion" data-seed="CAVES-001">Cave System</button>
+                <button class="seed-suggestion" data-seed="RUINS-001">Ancient Ruins</button>
+                <button class="seed-suggestion" data-seed="TEST-123">Test World</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vault Modal -->
+    <div id="vault-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>NEXUS Vault</h2>
+            <p>Your secure storage in the NEXUS hub</p>
+            <div id="vault-contents">
+                <p>Vault is empty</p>
+            </div>
+            <button id="vault-close-btn">Close</button>
+        </div>
+    </div>
+
+    <!-- Version Info Footer -->
+    <div id="version-info">
+        <span>IME v3.0.0-alpha | Based on NEXUS HUB 2.4 | Agent Development Build</span>
+        <span id="playtest-mode">PLAYTEST MODE - Precog Build</span>
+    </div>
+
+    <!-- Load game engine -->
+    <script src="src/js/rng.js"></script>
+    <script src="src/js/world-generator.js"></script>
+    <script src="src/js/renderer.js"></script>
+    <script src="src/js/player.js"></script>
+    <script src="src/js/game-engine.js"></script>
+    <script src="src/js/main.js"></script>
+</body>
+</html>

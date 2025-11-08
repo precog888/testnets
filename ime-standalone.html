@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IME v3.0 - Integrated Multiverse Engine (Standalone)</title>
+    <style>
+        /* IME v3.0 - All-in-One Standalone Version */
+        
+        :root {
+            --gbc-darkest: #0f380f;
+            --gbc-dark-green: #306230;
+            --gbc-mid-green: #8bac0f;
+            --gbc-light: #9bbc0f;
+            --gbc-lightest: #e0f8d0;
+            --gbc-shadow: #081820;
+            --gbc-blue: #1a5f7a;
+            --gbc-brown: #8b4513;
+            --gbc-red: #aa3232;
+            --gbc-gold: #ffd700;
+            
+            --ui-bg: #0f0f1a;
+            --ui-panel: #1a1a2e;
+            --ui-border: var(--gbc-mid-green);
+            --ui-text: var(--gbc-lightest);
+            --ui-accent: var(--gbc-gold);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--ui-bg) 0%, #1a1a3e 100%);
+            color: var(--ui-text);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #game-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 250px;
+            grid-template-rows: 1fr auto;
+            gap: 20px;
+            width: 95vw;
+            height: 95vh;
+            max-width: 1600px;
+            padding: 20px;
+        }
+
+        #info-panel {
+            background: var(--ui-panel);
+            border: 3px solid var(--ui-border);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #info-panel h1 {
+            color: var(--ui-accent);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        #stats {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            border: 1px solid var(--gbc-mid-green);
+        }
+
+        #stats span {
+            font-size: 0.95rem;
+            color: var(--gbc-light);
+        }
+
+        #stats span span {
+            color: var(--ui-accent);
+            font-weight: bold;
+        }
+
+        #controls-help {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid var(--gbc-mid-green);
+        }
+
+        #controls-help strong {
+            color: var(--ui-accent);
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #controls-help ul {
+            list-style: none;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        kbd {
+            background: var(--gbc-dark-green);
+            padding: 2px 8px;
+            border-radius: 3px;
+            border: 1px solid var(--gbc-mid-green);
+            font-size: 0.8rem;
+            color: var(--gbc-lightest);
+            font-weight: bold;
+        }
+
+        #game-canvas {
+            background: var(--gbc-darkest);
+            border: 4px solid var(--ui-border);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #debug-panel {
+            background: var(--ui-panel);
+            border: 3px solid var(--ui-border);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #debug-panel h3 {
+            color: var(--ui-accent);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        #debug-info {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        #debug-info div {
+            padding: 5px;
+            border-bottom: 1px solid rgba(139, 172, 15, 0.2);
+        }
+
+        #debug-info span {
+            color: var(--ui-accent);
+            font-weight: bold;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: var(--ui-panel);
+            border: 4px solid var(--ui-border);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-content h2 {
+            color: var(--ui-accent);
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--gbc-mid-green);
+            border-radius: 5px;
+            color: var(--ui-text);
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 20px;
+        }
+
+        .modal-content button {
+            padding: 12px 24px;
+            background: var(--gbc-dark-green);
+            border: 2px solid var(--gbc-mid-green);
+            border-radius: 5px;
+            color: var(--gbc-lightest);
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 5px;
+        }
+
+        .modal-content button:hover {
+            background: var(--gbc-mid-green);
+            transform: translateY(-2px);
+        }
+
+        #version-info {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            border: 1px solid var(--gbc-mid-green);
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 1200px) {
+            #game-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="info-panel">
+            <h1>IME v3.0 - NEXUS HUB</h1>
+            <div id="stats">
+                <span>Soul Seed: <span id="soul-seed">Loading...</span></span>
+                <span>Gold: <span id="gold">0</span></span>
+                <span>World: <span id="current-world">NEXUS</span></span>
+            </div>
+            <div id="controls-help">
+                <strong>Controls:</strong>
+                <ul>
+                    <li><kbd>WASD</kbd> or <kbd>Arrows</kbd> - Move</li>
+                    <li><kbd>F</kbd> - Toggle Resolution</li>
+                    <li><kbd>P</kbd> - Portal Jump</li>
+                    <li><kbd>V</kbd> - Vault (NEXUS only)</li>
+                    <li><kbd>ESC</kbd> - Return to NEXUS</li>
+                </ul>
+            </div>
+        </div>
+        
+        <canvas id="game-canvas"></canvas>
+        
+        <div id="debug-panel">
+            <h3>Debug Info</h3>
+            <div id="debug-info">
+                <div>FPS: <span id="fps">0</span></div>
+                <div>Position: <span id="position">0, 0</span></div>
+                <div>Tile: <span id="current-tile">0</span></div>
+            </div>
+        </div>
+
+        <div id="version-info">
+            <span>IME v3.0.0-alpha | Standalone Build</span>
+            <span>Playtest Mode - Save &amp; Run Locally</span>
+        </div>
+    </div>
+
+    <div id="portal-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Portal Jump</h2>
+            <input type="text" id="seed-input" placeholder="Enter seed (e.g., WORLD-001)">
+            <button id="portal-jump-btn">Jump</button>
+            <button id="portal-cancel-btn">Cancel</button>
+            <div>
+                <p style="margin-top: 15px; color: #8bac0f;">Try: FOREST-001, CAVES-001, RUINS-001</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====================================================================
+        // IME v3.0 - STANDALONE VERSION - ALL CODE INLINE
+        // ====================================================================
+
+        // RNG - Seeded Random Number Generator
+        function xmur3a(str) {
+            let h = 1779033703 ^ str.length;
+            for (let i = 0; i < str.length; i++) {
+                h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+                h = h << 13 | h >>> 19;
+            }
+            return function() {
+                h = Math.imul(h ^ h >>> 16, 2246822507);
+                h = Math.imul(h ^ h >>> 13, 3266489909);
+                return (h ^= h >>> 16) >>> 0;
+            };
+        }
+
+        function sfc32(a, b, c, d) {
+            return function() {
+                a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0;
+                let t = (a + b) | 0;
+                a = b ^ b >>> 9;
+                b = c + (c << 3) | 0;
+                c = (c << 21 | c >>> 11);
+                d = d + 1 | 0;
+                t = t + d | 0;
+                c = c + t | 0;
+                return (t >>> 0) / 4294967296;
+            };
+        }
+
+        class SeededRNG {
+            constructor(seed) {
+                this.seed = seed;
+                const hash = xmur3a(seed);
+                this.rng = sfc32(hash(), hash(), hash(), hash());
+            }
+            random() { return this.rng(); }
+            randomInt(min, max) { return Math.floor(this.random() * (max - min + 1)) + min; }
+            choose(array) { return array[this.randomInt(0, array.length - 1)]; }
+        }
+
+        // Tiles
+        const TILES = {
+            FLOOR: 0, WALL: 1, DOOR: 2, STAIRS_DOWN: 3, STAIRS_UP: 4,
+            TREASURE: 5, WATER: 6, LAVA: 7, GRASS: 8, STONE: 9
+        };
+
+        // World Generator
+        class WorldGenerator {
+            constructor(seed, width = 64, height = 36) {
+                this.seed = seed;
+                this.width = width;
+                this.height = height;
+                this.rng = new SeededRNG(seed);
+                this.map = [];
+                this.rooms = [];
+                this.isNexus = (seed === 'NEXUS-HUB-001');
+            }
+
+            generate() {
+                if (this.isNexus) return { map: null, rooms: [], spawnPoint: { x: this.width / 2, y: this.height / 2 }, isNexus: true };
+                
+                this.initializeMap();
+                this.createBoundary();
+                this.generateRooms();
+                this.connectRooms();
+                this.addDetails();
+                
+                return {
+                    map: this.map,
+                    rooms: this.rooms,
+                    spawnPoint: this.findSpawnPoint(),
+                    isNexus: false
+                };
+            }
+
+            initializeMap() {
+                for (let y = 0; y < this.height; y++) {
+                    this.map[y] = [];
+                    for (let x = 0; x < this.width; x++) {
+                        this.map[y][x] = TILES.WALL;
+                    }
+                }
+            }
+
+            createBoundary() {
+                for (let x = 0; x < this.width; x++) {
+                    this.map[0][x] = this.map[1][x] = TILES.WALL;
+                    this.map[this.height - 1][x] = this.map[this.height - 2][x] = TILES.WALL;
+                }
+                for (let y = 0; y < this.height; y++) {
+                    this.map[y][0] = this.map[y][1] = TILES.WALL;
+                    this.map[y][this.width - 1] = this.map[y][this.width - 2] = TILES.WALL;
+                }
+            }
+
+            generateRooms() {
+                const targetRooms = this.rng.randomInt(4, 8);
+                let attempts = 0;
+                while (this.rooms.length < targetRooms && attempts < 100) {
+                    attempts++;
+                    const w = this.rng.randomInt(5, 12);
+                    const h = this.rng.randomInt(5, 12);
+                    const x = this.rng.randomInt(3, this.width - w - 3);
+                    const y = this.rng.randomInt(3, this.height - h - 3);
+                    const room = { x, y, width: w, height: h, centerX: x + Math.floor(w/2), centerY: y + Math.floor(h/2) };
+                    
+                    if (!this.roomOverlaps(room)) {
+                        this.rooms.push(room);
+                        this.carveRoom(room);
+                    }
+                }
+            }
+
+            roomOverlaps(newRoom) {
+                for (const room of this.rooms) {
+                    if (newRoom.x < room.x + room.width + 1 && newRoom.x + newRoom.width + 1 > room.x &&
+                        newRoom.y < room.y + room.height + 1 && newRoom.y + newRoom.height + 1 > room.y) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            carveRoom(room) {
+                for (let y = room.y; y < room.y + room.height; y++) {
+                    for (let x = room.x; x < room.x + room.width; x++) {
+                        this.map[y][x] = TILES.FLOOR;
+                    }
+                }
+            }
+
+            connectRooms() {
+                for (let i = 0; i < this.rooms.length - 1; i++) {
+                    this.carveCorridor(this.rooms[i].centerX, this.rooms[i].centerY, 
+                                      this.rooms[i + 1].centerX, this.rooms[i + 1].centerY);
+                }
+            }
+
+            carveCorridor(x1, y1, x2, y2) {
+                let x = x1, y = y1;
+                while (x !== x2 || y !== y2) {
+                    this.setTile(x, y, TILES.FLOOR);
+                    if (this.rng.random() > 0.5) {
+                        if (x < x2) x++; else if (x > x2) x--;
+                    } else {
+                        if (y < y2) y++; else if (y > y2) y--;
+                    }
+                }
+            }
+
+            addDetails() {
+                if (this.rooms.length > 0) {
+                    this.setTile(this.rooms[0].centerX, this.rooms[0].centerY, TILES.STAIRS_UP);
+                    this.setTile(this.rooms[this.rooms.length - 1].centerX, 
+                               this.rooms[this.rooms.length - 1].centerY, TILES.STAIRS_DOWN);
+                    
+                    for (let i = 0; i < Math.min(3, this.rooms.length); i++) {
+                        const room = this.rooms[this.rng.randomInt(0, this.rooms.length - 1)];
+                        this.setTile(this.rng.randomInt(room.x + 1, room.x + room.width - 2),
+                                   this.rng.randomInt(room.y + 1, room.y + room.height - 2), TILES.TREASURE);
+                    }
+                }
+            }
+
+            findSpawnPoint() {
+                if (this.rooms.length > 0) {
+                    return { x: this.rooms[0].centerX, y: this.rooms[0].centerY };
+                }
+                return { x: Math.floor(this.width / 2), y: Math.floor(this.height / 2) };
+            }
+
+            setTile(x, y, tile) {
+                if (x >= 2 && x < this.width - 2 && y >= 2 && y < this.height - 2) {
+                    this.map[y][x] = tile;
+                }
+            }
+
+            getTile(x, y) {
+                if (x < 0 || x >= this.width || y < 0 || y >= this.height) return TILES.WALL;
+                return this.map[y][x];
+            }
+
+            isWalkable(x, y) {
+                const tile = this.getTile(x, y);
+                return tile === TILES.FLOOR || tile === TILES.STAIRS_DOWN || tile === TILES.STAIRS_UP;
+            }
+        }
+
+        // Colors
+        const GBC_COLORS = {
+            DARKEST: '#0f380f', DARK_GREEN: '#306230', MID_GREEN: '#8bac0f',
+            LIGHT: '#9bbc0f', LIGHTEST: '#e0f8d0', SHADOW: '#081820',
+            BLUE: '#1a5f7a', BROWN: '#8b4513', RED: '#aa3232', GOLD: '#ffd700'
+        };
+
+        const TILE_COLORS = {
+            0: GBC_COLORS.LIGHTEST, 1: GBC_COLORS.DARK_GREEN, 2: GBC_COLORS.BROWN,
+            3: GBC_COLORS.BLUE, 4: GBC_COLORS.BLUE, 5: GBC_COLORS.GOLD,
+            6: GBC_COLORS.BLUE, 7: GBC_COLORS.RED, 8: GBC_COLORS.MID_GREEN, 9: GBC_COLORS.SHADOW
+        };
+
+        // Renderer
+        class Renderer {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.currentMode = 'modern';
+                this.setResolution('modern');
+                this.tileSize = 8;
+                this.camera = { x: 0, y: 0 };
+                this.stars = [];
+                this.initStarfield();
+            }
+
+            setResolution(mode) {
+                const res = mode === 'retro' ? { width: 160, height: 144 } : { width: 256, height: 144 };
+                this.canvas.width = res.width;
+                this.canvas.height = res.height;
+                this.ctx.imageSmoothingEnabled = false;
+            }
+
+            toggleResolution() {
+                this.currentMode = (this.currentMode === 'retro') ? 'modern' : 'retro';
+                this.setResolution(this.currentMode);
+                return this.currentMode;
+            }
+
+            initStarfield() {
+                for (let i = 0; i < 100; i++) {
+                    this.stars.push({
+                        x: Math.random() * 256, y: Math.random() * 144,
+                        size: Math.random() * 2 + 0.5, speed: Math.random() * 0.5 + 0.1,
+                        brightness: Math.random() * 0.5 + 0.5
+                    });
+                }
+            }
+
+            updateStarfield() {
+                for (const star of this.stars) {
+                    star.y += star.speed;
+                    if (star.y > 144) {
+                        star.y = 0;
+                        star.x = Math.random() * 256;
+                    }
+                }
+            }
+
+            clear() {
+                this.ctx.fillStyle = GBC_COLORS.DARKEST;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            renderNexus() {
+                this.ctx.fillStyle = GBC_COLORS.SHADOW;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                for (const star of this.stars) {
+                    this.ctx.fillStyle = `rgba(224, 248, 208, ${star.brightness})`;
+                    this.ctx.fillRect(Math.floor(star.x), Math.floor(star.y), 
+                                    Math.ceil(star.size), Math.ceil(star.size));
+                }
+                
+                this.ctx.fillStyle = GBC_COLORS.GOLD;
+                this.ctx.font = '16px monospace';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('NEXUS HUB', this.canvas.width / 2, 30);
+                
+                this.ctx.fillStyle = GBC_COLORS.LIGHTEST;
+                this.ctx.font = '8px monospace';
+                this.ctx.fillText('Press P to Portal Jump', this.canvas.width / 2, 60);
+            }
+
+            renderDungeon(world, player) {
+                if (!world.map) {
+                    this.renderNexus();
+                    return;
+                }
+                
+                this.updateCamera(player, world);
+                
+                const tilesX = Math.ceil(this.canvas.width / this.tileSize);
+                const tilesY = Math.ceil(this.canvas.height / this.tileSize);
+                const startX = Math.floor(this.camera.x);
+                const startY = Math.floor(this.camera.y);
+                
+                for (let ty = 0; ty < tilesY; ty++) {
+                    for (let tx = 0; tx < tilesX; tx++) {
+                        const worldX = startX + tx;
+                        const worldY = startY + ty;
+                        if (worldX >= 0 && worldX < world.map[0].length && worldY >= 0 && worldY < world.map.length) {
+                            this.renderTile(tx * this.tileSize, ty * this.tileSize, world.map[worldY][worldX]);
+                        }
+                    }
+                }
+                
+                this.renderPlayer(player);
+            }
+
+            updateCamera(player, world) {
+                const tilesX = Math.ceil(this.canvas.width / this.tileSize);
+                const tilesY = Math.ceil(this.canvas.height / this.tileSize);
+                this.camera.x = Math.max(0, Math.min(player.x - tilesX / 2, world.map[0].length - tilesX));
+                this.camera.y = Math.max(0, Math.min(player.y - tilesY / 2, world.map.length - tilesY));
+            }
+
+            renderTile(screenX, screenY, tileType) {
+                this.ctx.fillStyle = TILE_COLORS[tileType] || GBC_COLORS.DARKEST;
+                this.ctx.fillRect(screenX, screenY, this.tileSize, this.tileSize);
+                
+                if (tileType === 1) {
+                    this.ctx.strokeStyle = GBC_COLORS.SHADOW;
+                    this.ctx.lineWidth = 1;
+                    this.ctx.strokeRect(screenX, screenY, this.tileSize, this.tileSize);
+                }
+                if (tileType === 5) {
+                    this.ctx.fillStyle = GBC_COLORS.RED;
+                    this.ctx.fillRect(screenX + 3, screenY + 3, 2, 2);
+                }
+            }
+
+            renderPlayer(player) {
+                const screenX = (player.x - this.camera.x) * this.tileSize;
+                const screenY = (player.y - this.camera.y) * this.tileSize;
+                this.ctx.fillStyle = GBC_COLORS.GOLD;
+                this.ctx.fillRect(screenX + 1, screenY + 1, this.tileSize - 2, this.tileSize - 2);
+            }
+        }
+
+        // Player
+        class Player {
+            constructor() {
+                this.x = 0;
+                this.y = 0;
+                this.gold = 0;
+                this.soulSeed = `SOUL-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+                this.inventory = [];
+                this.vault = [];
+                this.moveDelay = 150;
+                this.lastMoveTime = 0;
+                this.load();
+            }
+
+            setPosition(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+
+            move(dx, dy, world) {
+                const now = Date.now();
+                if (now - this.lastMoveTime < this.moveDelay) return false;
+                
+                const newX = this.x + dx;
+                const newY = this.y + dy;
+                
+                if (this.canMoveTo(newX, newY, world)) {
+                    this.x = newX;
+                    this.y = newY;
+                    this.lastMoveTime = now;
+                    this.checkTileInteraction(world);
+                    return true;
+                }
+                return false;
+            }
+
+            canMoveTo(x, y, world) {
+                if (world.isNexus) return true;
+                if (x < 0 || x >= world.map[0].length || y < 0 || y >= world.map.length) return false;
+                return world.isWalkable(x, y);
+            }
+
+            checkTileInteraction(world) {
+                if (world.isNexus || !world.map) return;
+                const tile = world.getTile(this.x, this.y);
+                if (tile === 5) {
+                    const goldAmount = Math.floor(Math.random() * 50) + 10;
+                    this.addGold(goldAmount);
+                    world.map[this.y][this.x] = 0;
+                }
+            }
+
+            addGold(amount) {
+                this.gold += amount;
+                this.save();
+            }
+
+            save() {
+                try {
+                    localStorage.setItem('ime_player_data', JSON.stringify({
+                        soulSeed: this.soulSeed,
+                        gold: this.gold,
+                        inventory: this.inventory,
+                        vault: this.vault
+                    }));
+                } catch (e) {
+                    console.error('Save failed:', e);
+                }
+            }
+
+            load() {
+                try {
+                    const data = JSON.parse(localStorage.getItem('ime_player_data') || '{}');
+                    this.soulSeed = data.soulSeed || this.soulSeed;
+                    this.gold = data.gold || 0;
+                    this.inventory = data.inventory || [];
+                    this.vault = data.vault || [];
+                } catch (e) {
+                    console.error('Load failed:', e);
+                }
+            }
+
+            getStats() {
+                return {
+                    soulSeed: this.soulSeed,
+                    gold: this.gold,
+                    inventoryCount: this.inventory.length,
+                    vaultCount: this.vault.length
+                };
+            }
+        }
+
+        // Game Engine
+        class GameEngine {
+            constructor() {
+                this.canvas = document.getElementById('game-canvas');
+                this.renderer = new Renderer(this.canvas);
+                this.player = new Player();
+                this.currentSeed = 'NEXUS-HUB-001';
+                this.currentWorld = null;
+                this.running = false;
+                this.lastFrameTime = 0;
+                this.fps = 0;
+                this.frameCount = 0;
+                this.fpsUpdateTime = 0;
+                this.keys = {};
+                
+                this.setupInput();
+                this.setupUI();
+                this.init();
+            }
+
+            init() {
+                this.loadWorld('NEXUS-HUB-001');
+                this.running = true;
+                this.loop();
+                console.log('IME v3.0 Standalone - Initialized');
+            }
+
+            loadWorld(seed) {
+                this.currentSeed = seed;
+                const generator = new WorldGenerator(seed);
+                this.currentWorld = generator.generate();
+                if (this.currentWorld.spawnPoint) {
+                    this.player.setPosition(this.currentWorld.spawnPoint.x, this.currentWorld.spawnPoint.y);
+                }
+                this.updateUI();
+            }
+
+            loop(timestamp = 0) {
+                if (!this.running) return;
+                
+                const deltaTime = timestamp - this.lastFrameTime;
+                this.lastFrameTime = timestamp;
+                
+                this.updateFPS(timestamp);
+                this.update(deltaTime);
+                this.render();
+                
+                requestAnimationFrame((t) => this.loop(t));
+            }
+
+            updateFPS(timestamp) {
+                this.frameCount++;
+                if (timestamp - this.fpsUpdateTime >= 1000) {
+                    this.fps = this.frameCount;
+                    this.frameCount = 0;
+                    this.fpsUpdateTime = timestamp;
+                    document.getElementById('fps').textContent = this.fps;
+                }
+            }
+
+            update(deltaTime) {
+                this.handleInput();
+                if (this.currentWorld && this.currentWorld.isNexus) {
+                    this.renderer.updateStarfield();
+                }
+                this.updateDebugInfo();
+            }
+
+            handleInput() {
+                let dx = 0, dy = 0;
+                if (this.keys['ArrowUp'] || this.keys['w'] || this.keys['W']) dy = -1;
+                if (this.keys['ArrowDown'] || this.keys['s'] || this.keys['S']) dy = 1;
+                if (this.keys['ArrowLeft'] || this.keys['a'] || this.keys['A']) dx = -1;
+                if (this.keys['ArrowRight'] || this.keys['d'] || this.keys['D']) dx = 1;
+                
+                if (dx !== 0 && dy !== 0) dx = 0;
+                if (dx !== 0 || dy !== 0) this.player.move(dx, dy, this.currentWorld);
+            }
+
+            render() {
+                this.renderer.clear();
+                if (this.currentWorld) {
+                    if (this.currentWorld.isNexus) {
+                        this.renderer.renderNexus();
+                    } else {
+                        this.renderer.renderDungeon(this.currentWorld, this.player);
+                    }
+                }
+            }
+
+            setupInput() {
+                window.addEventListener('keydown', (e) => {
+                    this.keys[e.key] = true;
+                    if (e.key === 'f' || e.key === 'F') {
+                        const mode = this.renderer.toggleResolution();
+                        console.log(`Resolution: ${mode}`);
+                    }
+                    if (e.key === 'p' || e.key === 'P') this.showPortalModal();
+                    if (e.key === 'Escape') {
+                        this.hidePortalModal();
+                        this.returnToNexus();
+                    }
+                });
+                window.addEventListener('keyup', (e) => {
+                    this.keys[e.key] = false;
+                });
+            }
+
+            setupUI() {
+                document.getElementById('portal-jump-btn').addEventListener('click', () => {
+                    const seed = document.getElementById('seed-input').value.trim();
+                    if (seed) {
+                        this.loadWorld(seed);
+                        this.hidePortalModal();
+                    }
+                });
+                document.getElementById('portal-cancel-btn').addEventListener('click', () => {
+                    this.hidePortalModal();
+                });
+            }
+
+            updateUI() {
+                const stats = this.player.getStats();
+                document.getElementById('soul-seed').textContent = stats.soulSeed.substring(0, 20) + '...';
+                document.getElementById('gold').textContent = stats.gold;
+                document.getElementById('current-world').textContent = 
+                    this.currentWorld && this.currentWorld.isNexus ? 'NEXUS' : this.currentSeed;
+            }
+
+            updateDebugInfo() {
+                document.getElementById('position').textContent = 
+                    `${Math.floor(this.player.x)}, ${Math.floor(this.player.y)}`;
+                if (this.currentWorld && !this.currentWorld.isNexus) {
+                    const tile = this.currentWorld.getTile(Math.floor(this.player.x), Math.floor(this.player.y));
+                    document.getElementById('current-tile').textContent = tile;
+                } else {
+                    document.getElementById('current-tile').textContent = '-';
+                }
+            }
+
+            showPortalModal() {
+                document.getElementById('portal-modal').classList.remove('hidden');
+                document.getElementById('seed-input').focus();
+            }
+
+            hidePortalModal() {
+                document.getElementById('portal-modal').classList.add('hidden');
+                document.getElementById('seed-input').value = '';
+            }
+
+            returnToNexus() {
+                if (!this.currentWorld || !this.currentWorld.isNexus) {
+                    this.loadWorld('NEXUS-HUB-001');
+                }
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('IME v3.0 Standalone - Starting...');
+            const game = new GameEngine();
+            window.IME = { game: () => game };
+            console.log('Game ready! Type IME.game() in console for debug access');
+        });
+    </script>
+</body>
+</html>
