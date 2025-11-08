@@ -51,9 +51,13 @@ We prioritize a **controlled, iterative approach** where:
 
 ## Getting Started
 
-For detailed collaboration guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+📚 **[Documentation Index](docs/INDEX.md)** - Complete guide to all documentation
 
-For workflow documentation, see [docs/WORKFLOW.md](docs/WORKFLOW.md).
+**Quick Links**:
+- **New here?** Start with the [Quick Start Guide](docs/QUICK_START.md)
+- **Contributing?** Read the [Contributing Guidelines](CONTRIBUTING.md)
+- **Need details?** Check the [Workflow Documentation](docs/WORKFLOW.md)
+- **Using RecursiveAgent?** See the [API Documentation](docs/RECURSIVE_AGENT.md)
 
 ## Feedback
 
